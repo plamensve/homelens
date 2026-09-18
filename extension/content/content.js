@@ -49,7 +49,7 @@
   panel.querySelector("#hl-save").addEventListener("click", async () => {
     const result = await HomeLens.store.saveProperty(property);
     const status = panel.querySelector("#hl-status");
-    if (result.ok) status.textContent = result.alreadySaved ? "Имотът вече е запазен." : "Имотът е запазен.";
+    if (result.ok) status.textContent = result.updated ? "Запазеният имот и снимките са обновени." : "Имотът е запазен.";
     else status.textContent = `Безплатният план позволява ${HomeLens.CONFIG.FREE_SAVED_LIMIT} имота. Отвори HomeLens за Premium.`;
   });
 

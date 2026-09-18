@@ -15,7 +15,7 @@
   function createCard(item) {
     const element = document.createElement("article");
     element.className = "card";
-    element.innerHTML = `<div class="card-image"></div><div class="card-body"><span class="card-source"></span><h2></h2><p class="card-location"></p><div class="card-price"><strong></strong><span></span></div><div class="facts"><div><span>Площ</span><strong>${HomeLens.utils.formatNumber(item.area, 1)} м²</strong></div><div><span>Стаи</span><strong>${item.rooms || "—"}</strong></div><div><span>Тип</span><strong class="type"></strong></div></div><div class="card-actions"><a target="_blank" rel="noreferrer">Отвори обявата</a><button type="button" title="Премахни">✕</button></div></div>`;
+    element.innerHTML = `<div class="card-image"><img class="card-photo" alt=""><span class="no-image">⌂</span><button class="gallery-arrow gallery-prev hidden" type="button" aria-label="Предишна снимка">‹</button><button class="gallery-arrow gallery-next hidden" type="button" aria-label="Следваща снимка">›</button><span class="gallery-count"></span></div><div class="card-body"><span class="card-source"></span><h2></h2><p class="card-location"></p><div class="card-price"><strong></strong><span></span></div><div class="facts"><div><span>Площ</span><strong>${HomeLens.utils.formatNumber(item.area, 1)} м²</strong></div><div><span>Стаи</span><strong>${item.rooms || "—"}</strong></div><div><span>Тип</span><strong class="type"></strong></div></div><div class="card-actions"><a target="_blank" rel="noreferrer">Отвори обявата</a><button type="button" title="Премахни">✕</button></div></div>`;
     element.querySelector(".card-source").textContent = item.source;
     element.querySelector("h2").textContent = item.title;
     element.querySelector(".card-location").textContent = item.location || "Локация не е разпозната";
@@ -23,8 +23,27 @@
     element.querySelector(".card-price span").textContent = `${HomeLens.utils.formatMoney(item.pricePerSqm, "EUR", 0)}/м²`;
     element.querySelector(".type").textContent = item.propertyType || "—";
     element.querySelector("a").href = item.url;
-    if (item.image) element.querySelector(".card-image").style.backgroundImage = `url(${JSON.stringify(item.image).slice(1, -1)})`;
-    element.querySelector("button").addEventListener("click", async () => { saved = await HomeLens.store.removeSaved(item.id); render(); });
+    const images = [...new Set([...(Array.isArray(item.images) ? item.images : []), item.image].filter((value) => {
+      try { return /^https?:$/.test(new URL(value).protocol); } catch { return false; }
+    }))];
+    const photo = element.querySelector(".card-photo");
+    const counter = element.querySelector(".gallery-count");
+    const previous = element.querySelector(".gallery-prev");
+    const next = element.querySelector(".gallery-next");
+    let imageIndex = 0;
+    const renderImage = () => {
+      if (images.length) photo.src = images[imageIndex];
+      else photo.removeAttribute("src");
+      counter.textContent = images.length > 1 ? `${imageIndex + 1}/${images.length}` : "";
+      previous.classList.toggle("hidden", images.length < 2);
+      next.classList.toggle("hidden", images.length < 2);
+    };
+    photo.addEventListener("load", () => element.querySelector(".card-image").classList.add("has-image"));
+    photo.addEventListener("error", () => element.querySelector(".card-image").classList.remove("has-image"));
+    previous.addEventListener("click", (event) => { event.stopPropagation(); imageIndex = (imageIndex - 1 + images.length) % images.length; renderImage(); });
+    next.addEventListener("click", (event) => { event.stopPropagation(); imageIndex = (imageIndex + 1) % images.length; renderImage(); });
+    renderImage();
+    element.querySelector(".card-actions button").addEventListener("click", async () => { saved = await HomeLens.store.removeSaved(item.id); render(); });
     return element;
   }
 

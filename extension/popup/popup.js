@@ -59,7 +59,7 @@
   $("#save-property").addEventListener("click", async () => {
     if (!current) return;
     const result = await HomeLens.store.saveProperty(current.property);
-    setText("#action-status", result.ok ? (result.alreadySaved ? "Имотът вече е запазен." : "Имотът е запазен.") : `Достигна лимита от ${HomeLens.CONFIG.FREE_SAVED_LIMIT} имота.`);
+    setText("#action-status", result.ok ? (result.updated ? "Запазеният имот и снимките са обновени." : "Имотът е запазен.") : `Достигна лимита от ${HomeLens.CONFIG.FREE_SAVED_LIMIT} имота.`);
     if (!result.ok) show("#license-form");
   });
 

@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "HomeLens – анализатор на имоти",
   "short_name": "HomeLens",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Цена на кв.м, ипотека, разходи, история и сравнение на обяви за имоти.",
   "minimum_chrome_version": "120",
   "permissions": ["storage", "alarms"],

@@ -142,6 +142,75 @@
     return fallback ? U.parseMoney(`${fallback[1]} ${fallback[2]}`) : null;
   }
 
+  function normalizeImageUrl(value, baseUrl) {
+    const raw = typeof value === "string" ? value : value?.url || value?.contentUrl || "";
+    if (!raw || raw.startsWith("data:") || raw.startsWith("blob:")) return null;
+    try {
+      const url = new URL(raw, baseUrl);
+      if (!/^https?:$/.test(url.protocol)) return null;
+      if (/\.(?:svg|gif)(?:$|\?)/i.test(url.pathname) || /(?:logo|icon|avatar|sprite|placeholder)/i.test(url.pathname)) return null;
+      return url.href;
+    } catch {
+      return null;
+    }
+  }
+
+  function imageSources(image) {
+    const linkedImage = image.closest?.("a")?.href;
+    if (linkedImage && /\.(?:avif|jpe?g|png|webp)(?:$|[?#])/i.test(linkedImage)) return [linkedImage];
+    const fullSize = image.dataset?.full || image.dataset?.large || image.dataset?.zoomImage || image.getAttribute?.("data-full-image");
+    if (fullSize) return [fullSize];
+    for (const srcset of [image.srcset, image.dataset?.srcset, image.getAttribute?.("data-srcset")]) {
+      if (!srcset) continue;
+      const responsive = srcset.split(",").map((part) => {
+        const [url, descriptor = "0"] = part.trim().split(/\s+/);
+        return { url, size: Number.parseFloat(descriptor) || 0 };
+      }).filter((item) => item.url).sort((a, b) => b.size - a.size);
+      if (responsive[0]) return [responsive[0].url];
+    }
+    return [
+      image.currentSrc, image.dataset?.src, image.dataset?.original, image.dataset?.lazySrc,
+      image.getAttribute?.("data-src"), image.getAttribute?.("data-original"),
+      image.getAttribute?.("data-lazy-src"), image.src
+    ].filter(Boolean).slice(0, 1);
+  }
+
+  function collectImages(doc, ld, pageUrl) {
+    const candidates = [];
+    const add = (value, priority = 0) => {
+      for (const item of [].concat(value || [])) {
+        const url = normalizeImageUrl(item, pageUrl);
+        if (url) candidates.push({ url, priority });
+      }
+    };
+
+    add(ld.image, 100);
+    add(firstMeta(doc, ["meta[property='og:image']", "meta[name='twitter:image']"]), 90);
+
+    const gallerySelectors = [
+      "[data-testid*='image'] img", "[data-cy*='photo'] img", "[data-cy*='image'] img",
+      "[class*='gallery'] img", "[class*='Gallery'] img", "[class*='photo'] img",
+      "[class*='Photo'] img", "[class*='slider'] img", "[class*='carousel'] img",
+      "[itemprop='image']"
+    ];
+    for (const image of doc.querySelectorAll(gallerySelectors.join(","))) {
+      add(imageSources(image), 70);
+    }
+
+    for (const image of doc.images) {
+      const width = image.naturalWidth || Number(image.getAttribute("width")) || 0;
+      const height = image.naturalHeight || Number(image.getAttribute("height")) || 0;
+      if (width >= 480 && height >= 280) add(imageSources(image), 40);
+    }
+
+    const unique = new Map();
+    candidates.sort((a, b) => b.priority - a.priority).forEach((item) => {
+      const key = item.url.replace(/[?&](?:width|height|w|h)=\d+/gi, "");
+      if (!unique.has(key)) unique.set(key, item.url);
+    });
+    return [...unique.values()];
+  }
+
   function extractProperty(doc = document, locationObj = location) {
     const host = hostKey(locationObj.hostname);
     const schema = SELECTORS[host] || { title: ["h1"], price: ["[itemprop='price']"], location: ["[itemprop='address']"], description: ["[itemprop='description']"] };
@@ -156,7 +225,8 @@
     const area = U.parseNumber(ld.floorSize?.value || ld.floorSize) || extractArea(`${title} ${description} ${fullText.slice(0, 30000)}`);
     const canonical = doc.querySelector("link[rel='canonical']")?.href || locationObj.href;
     const url = U.cleanUrl(canonical);
-    const image = [].concat(ld.image || [])[0] || firstMeta(doc, ["meta[property='og:image']"]);
+    const images = collectImages(doc, ld, locationObj.href);
+    const image = images[0] || "";
     const priceEur = money ? U.toEuro(money.amount, money.currency) : null;
 
     const publishedAt = extractPublishedAt(fullText.slice(0, 50000), ld);
@@ -180,6 +250,7 @@
       publishedAt,
       daysOnline: publishedAt ? Math.max(0, Math.floor((Date.now() - new Date(publishedAt).getTime()) / 86400000)) : null,
       image,
+      images,
       observedAt: new Date().toISOString(),
       fingerprint: ""
     };
@@ -191,5 +262,5 @@
     return property;
   }
 
-  HomeLens.extractor = { extractProperty, extractArea, extractRooms, extractPropertyType, extractPublishedAt, hostKey };
+  HomeLens.extractor = { extractProperty, extractArea, extractRooms, extractPropertyType, extractPublishedAt, collectImages, hostKey };
 })(globalThis);

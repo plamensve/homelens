@@ -47,7 +47,14 @@
 
   async function saveProperty(property) {
     const saved = await getSaved();
-    if (saved.some((item) => item.id === property.id)) return { ok: true, saved, alreadySaved: true };
+    const existingIndex = saved.findIndex((item) => item.id === property.id);
+    if (existingIndex >= 0) {
+      const next = saved.map((item, index) => index === existingIndex
+        ? { ...item, ...property, savedAt: item.savedAt || new Date().toISOString() }
+        : item);
+      await set({ [K.SAVED]: next });
+      return { ok: true, saved: next, alreadySaved: true, updated: true };
+    }
     if (!await isPremium() && saved.length >= HomeLens.CONFIG.FREE_SAVED_LIMIT) {
       return { ok: false, code: "FREE_LIMIT", saved };
     }
@@ -71,4 +78,3 @@
 
   HomeLens.store = { get, set, getSettings, saveSettings, getObservations, addObservation, getSaved, saveProperty, removeSaved, isPremium, exportCsv };
 })(globalThis);
-
