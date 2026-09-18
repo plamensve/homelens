@@ -1,6 +1,6 @@
 {
   "name": "homelens-extension",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": true,
   "description": "HomeLens – анализатор на обяви за имоти",
   "scripts": {
@@ -12,4 +12,3 @@
     "node": ">=20"
   }
 }
-

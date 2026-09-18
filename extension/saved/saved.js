@@ -2,6 +2,8 @@
   const $ = (selector) => document.querySelector(selector);
   let saved = await HomeLens.store.getSaved();
   const premium = await HomeLens.store.isPremium();
+  const settingFields = ["annualInterestRate", "mortgageYears", "downPaymentPercent", "acquisitionCostsPercent", "renovationPerSqm", "monthlyRent", "vacancyPercent", "annualMaintenancePercent"];
+  const calculatorSettings = await HomeLens.store.getSettings();
 
   function downloadCsv(csv) {
     const url = URL.createObjectURL(new Blob(["\uFEFF", csv], { type: "text/csv;charset=utf-8" }));
@@ -39,9 +41,49 @@
     $("#average-price").textContent = HomeLens.utils.formatMoney(HomeLens.utils.average(saved.map((item) => item.priceEur)), "EUR", 0);
   }
 
+  function readCalculatorSettings() {
+    const values = {};
+    settingFields.forEach((key) => { values[key] = Number(document.getElementById(key).value) || 0; });
+    return values;
+  }
+
+  function renderCalculatorPreview() {
+    const values = readCalculatorSettings();
+    const examplePrice = 150000;
+    const downPayment = examplePrice * values.downPaymentPercent / 100;
+    const principal = examplePrice - downPayment;
+    const payment = HomeLens.analyzer.mortgagePayment(principal, values.annualInterestRate, values.mortgageYears);
+    $("#preview-down").textContent = HomeLens.utils.formatMoney(downPayment, "EUR", 0);
+    $("#preview-payment").textContent = `${HomeLens.utils.formatMoney(payment, "EUR", 0)}/мес.`;
+    $("#preview-costs").textContent = HomeLens.utils.formatMoney(examplePrice * values.acquisitionCostsPercent / 100, "EUR", 0);
+  }
+
+  function activateTab(name, updateHash = true) {
+    const tab = name === "calculator" ? "calculator" : "saved";
+    document.querySelectorAll(".tab").forEach((button) => button.classList.toggle("active", button.dataset.tab === tab));
+    $("#panel-saved").classList.toggle("hidden", tab !== "saved");
+    $("#panel-calculator").classList.toggle("hidden", tab !== "calculator");
+    $("#export").classList.toggle("hidden", tab !== "saved");
+    if (updateHash) history.replaceState(null, "", `#${tab}`);
+  }
+
   render();
+  settingFields.forEach((key) => {
+    const input = document.getElementById(key);
+    input.value = calculatorSettings[key] ?? "";
+    input.addEventListener("input", renderCalculatorPreview);
+  });
+  renderCalculatorPreview();
   $("#free-note").classList.toggle("hidden", premium);
   $("#sort").addEventListener("change", render);
-  $("#settings").addEventListener("click", () => chrome.runtime.openOptionsPage());
   $("#export").addEventListener("click", async () => premium ? downloadCsv(await HomeLens.store.exportCsv()) : alert("CSV експортът е Premium функция."));
+  document.querySelectorAll(".tab").forEach((button) => button.addEventListener("click", () => activateTab(button.dataset.tab)));
+  $("#save-settings").addEventListener("click", async () => {
+    await HomeLens.store.saveSettings(readCalculatorSettings());
+    $("#settings-status").textContent = "Настройките са запазени и ще се използват при следващия анализ.";
+    $("#settings-badge").textContent = "Запазено";
+    setTimeout(() => { $("#settings-badge").textContent = "Локални настройки"; }, 1800);
+  });
+  window.addEventListener("hashchange", () => activateTab(location.hash.slice(1), false));
+  activateTab(location.hash.slice(1), false);
 })();

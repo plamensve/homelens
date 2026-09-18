@@ -53,8 +53,8 @@
     hide("#loading"); show("#unsupported");
   }
 
-  $("#open-options").addEventListener("click", () => chrome.runtime.openOptionsPage());
-  $("#open-saved").addEventListener("click", () => chrome.tabs.create({ url: chrome.runtime.getURL("saved/saved.html") }));
+  $("#open-options").addEventListener("click", () => chrome.tabs.create({ url: `${chrome.runtime.getURL("saved/saved.html")}#calculator` }));
+  $("#open-saved").addEventListener("click", () => chrome.tabs.create({ url: `${chrome.runtime.getURL("saved/saved.html")}#saved` }));
   $("#open-listing").addEventListener("click", () => current && chrome.tabs.update(tab.id, { url: current.property.url }));
   $("#save-property").addEventListener("click", async () => {
     if (!current) return;

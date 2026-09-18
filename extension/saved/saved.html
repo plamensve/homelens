@@ -2,13 +2,34 @@
 <html lang="bg">
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Моите имоти – HomeLens</title><link rel="stylesheet" href="saved.css"></head>
 <body>
-<header><div class="brand"><span>⌂</span><div><strong>HomeLens</strong><small>Моите запазени имоти</small></div></div><div><button id="export" class="secondary" type="button">Експорт CSV</button><button id="settings" class="icon" type="button">⚙</button></div></header>
+<header><div class="brand"><span>⌂</span><div><strong>HomeLens</strong><small>Център за управление</small></div></div><button id="export" class="secondary" type="button">Експорт CSV</button></header>
 <main>
-  <section class="summary"><div><span>Запазени имоти</span><strong id="saved-count">0</strong></div><div><span>Средна цена на м²</span><strong id="average-sqm">—</strong></div><div><span>Средна цена</span><strong id="average-price">—</strong></div></section>
-  <section class="toolbar"><div><h1>Сравнение на имоти</h1><p>Всички данни са запазени локално в този браузър.</p></div><select id="sort"><option value="newest">Най-нови</option><option value="price-asc">Най-ниска цена</option><option value="sqm-asc">Най-ниска цена/м²</option><option value="area-desc">Най-голяма площ</option></select></section>
-  <section id="empty" class="empty hidden"><span>⌂</span><h2>Все още няма запазени имоти</h2><p>Отвори обява в поддържан портал и натисни „Запази имота“.</p></section>
-  <section id="properties" class="properties"></section>
-  <aside id="free-note" class="free-note hidden"><strong>Безплатен план</strong><span>Можеш да запазиш до 5 имота. Premium отключва неограничени имоти и пълен експорт.</span></aside>
+  <nav class="tabs" aria-label="HomeLens секции">
+    <button id="tab-saved" class="tab active" type="button" data-tab="saved"><span>★</span>Запазени имоти</button>
+    <button id="tab-calculator" class="tab" type="button" data-tab="calculator"><span>⌁</span>Настройки на калкулатора</button>
+  </nav>
+
+  <section id="panel-saved" class="tab-panel">
+    <section class="summary"><div><span>Запазени имоти</span><strong id="saved-count">0</strong></div><div><span>Средна цена на м²</span><strong id="average-sqm">—</strong></div><div><span>Средна цена</span><strong id="average-price">—</strong></div></section>
+    <section class="toolbar"><div><h1>Сравнение на имоти</h1><p>Всички данни са запазени локално в този браузър.</p></div><select id="sort"><option value="newest">Най-нови</option><option value="price-asc">Най-ниска цена</option><option value="sqm-asc">Най-ниска цена/м²</option><option value="area-desc">Най-голяма площ</option></select></section>
+    <section id="empty" class="empty hidden"><span>⌂</span><h2>Все още няма запазени имоти</h2><p>Отвори обява в поддържан портал и натисни „Запази имота“.</p></section>
+    <section id="properties" class="properties"></section>
+    <aside id="free-note" class="free-note hidden"><strong>Безплатен план</strong><span>Можеш да запазиш до 5 имота. Premium отключва неограничени имоти и пълен експорт.</span></aside>
+  </section>
+
+  <section id="panel-calculator" class="tab-panel hidden">
+    <div class="calculator-heading"><div><h1>Настройки на калкулатора</h1><p>Стойностите се използват автоматично при анализа на всяка обява.</p></div><span class="saved-badge" id="settings-badge">Локални настройки</span></div>
+    <div class="calculator-layout">
+      <div class="settings-card">
+        <h2>Ипотечно финансиране</h2>
+        <div class="settings-grid"><label>Годишна лихва (%)<input id="annualInterestRate" type="number" min="0" max="30" step="0.1"></label><label>Срок (години)<input id="mortgageYears" type="number" min="1" max="40"></label><label>Самоучастие (%)<input id="downPaymentPercent" type="number" min="0" max="100"></label><label>Разходи по придобиване (%)<input id="acquisitionCostsPercent" type="number" min="0" max="20" step="0.1"></label></div>
+        <h2 class="section-title">Ремонт и доходност</h2>
+        <div class="settings-grid"><label>Ремонт на м² (€)<input id="renovationPerSqm" type="number" min="0" max="5000"></label><label>Очакван месечен наем (€)<input id="monthlyRent" type="number" min="0" max="100000"></label><label>Незаетост (%)<input id="vacancyPercent" type="number" min="0" max="100"></label><label>Годишна поддръжка (%)<input id="annualMaintenancePercent" type="number" min="0" max="20" step="0.1"></label></div>
+        <button id="save-settings" class="save-button" type="button">Запази настройките</button><p id="settings-status" role="status"></p>
+      </div>
+      <aside class="preview-card"><span class="eyebrow">ПРИМЕРНА СМЕТКА</span><h2>Имот за €150 000</h2><div><span>Необходимо самоучастие</span><strong id="preview-down">—</strong></div><div><span>Месечна вноска</span><strong id="preview-payment">—</strong></div><div><span>Разходи по придобиване</span><strong id="preview-costs">—</strong></div><p>Това е ориентировъчен пример. Реалните условия зависят от банката и конкретната сделка.</p></aside>
+    </div>
+  </section>
 </main>
-<script src="../src/constants.js"></script><script src="../src/utils.js"></script><script src="../src/storage.js"></script><script src="saved.js"></script>
+<script src="../src/constants.js"></script><script src="../src/utils.js"></script><script src="../src/analyzer.js"></script><script src="../src/storage.js"></script><script src="saved.js"></script>
 </body></html>
