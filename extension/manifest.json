@@ -1,0 +1,64 @@
+{
+  "manifest_version": 3,
+  "name": "HomeLens – анализатор на имоти",
+  "short_name": "HomeLens",
+  "version": "1.0.0",
+  "description": "Цена на кв.м, ипотека, разходи, история и сравнение на обяви за имоти.",
+  "minimum_chrome_version": "120",
+  "permissions": ["storage", "alarms"],
+  "host_permissions": [
+    "https://www.imot.bg/*",
+    "https://imot.bg/*",
+    "https://www.homes.bg/*",
+    "https://homes.bg/*",
+    "https://www.olx.bg/*",
+    "https://olx.bg/*",
+    "https://api.lemonsqueezy.com/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_title": "Анализирай този имот",
+    "default_popup": "popup/popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "options_page": "options/options.html",
+  "content_scripts": [
+    {
+      "matches": [
+        "https://www.imot.bg/*",
+        "https://imot.bg/*",
+        "https://www.homes.bg/*",
+        "https://homes.bg/*",
+        "https://www.olx.bg/*",
+        "https://olx.bg/*"
+      ],
+      "js": [
+        "src/constants.js",
+        "src/utils.js",
+        "src/extractor.js",
+        "src/analyzer.js",
+        "src/storage.js",
+        "content/content.js"
+      ],
+      "css": ["content/content.css"],
+      "run_at": "document_idle"
+    }
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'"
+  }
+}
+

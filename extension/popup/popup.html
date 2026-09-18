@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="bg">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>HomeLens</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand"><span class="brand-icon">⌂</span><div><strong>HomeLens</strong><small>По-информиран избор на имот</small></div></div>
+    <div class="top-actions"><button id="open-saved" class="icon-button" type="button" title="Запазени имоти">★</button><button id="open-options" class="icon-button" type="button" title="Настройки">⚙</button></div>
+  </header>
+
+  <main>
+    <section id="unsupported" class="state-card hidden">
+      <div class="state-icon">⌂</div><h1>Отвори обява за имот</h1>
+      <p>HomeLens работи с imot.bg, homes.bg и olx.bg. Отвори конкретна обява и натисни иконата отново.</p>
+    </section>
+
+    <section id="loading" class="state-card"><div class="spinner"></div><p>Анализираме обявата…</p></section>
+
+    <section id="analysis-view" class="hidden">
+      <article class="property-head">
+        <span id="source-badge" class="source-badge"></span>
+        <h1 id="property-title"></h1>
+        <p id="property-location"></p>
+      </article>
+
+      <div class="hero-card">
+        <span>Цена на квадратен метър</span>
+        <strong id="price-sqm"></strong>
+        <div><span id="total-price"></span><span id="area"></span></div>
+      </div>
+
+      <div class="metric-grid">
+        <article><span>Ипотека от</span><strong id="mortgage"></strong><small id="mortgage-note"></small></article>
+        <article><span id="days-label">Първоначални разходи</span><strong id="initial-costs"></strong><small id="initial-note">самоучастие + придобиване</small></article>
+      </div>
+
+      <article id="market-card" class="market-card">
+        <span class="status-dot"></span><div><strong id="market-verdict"></strong><small id="market-note"></small></div>
+      </article>
+
+      <article id="price-history" class="history-card hidden">
+        <div><span>Промяна на цената</span><strong id="history-change"></strong></div>
+        <small id="history-note"></small>
+      </article>
+
+      <div class="actions">
+        <button id="save-property" class="primary" type="button">Запази имота</button>
+        <button id="open-listing" class="secondary" type="button">Отвори обявата</button>
+      </div>
+      <p id="action-status" class="action-status" role="status"></p>
+
+      <section class="premium-card">
+        <div class="premium-label">HOMELENS PREMIUM</div>
+        <h2>Пълната картина преди покупка</h2>
+        <ul>
+          <li>Неограничени запазени имоти</li>
+          <li>История и сравними обяви</li>
+          <li>Доходност от наем и всички разходи</li>
+          <li>CSV експорт за собствен анализ</li>
+        </ul>
+        <div id="premium-locked">
+          <button id="upgrade-monthly" class="premium-button" type="button">Виж Premium плановете</button>
+          <button id="upgrade-30-day" class="outline-button" type="button">30 дни активно търсене</button>
+          <button id="activate-license" class="text-button" type="button">Имам лицензен ключ</button>
+        </div>
+        <div id="premium-active" class="premium-active hidden">
+          <div class="premium-status">✓ Premium е активен <button id="export-csv" type="button">Експортирай CSV</button></div>
+          <div class="premium-metrics"><div><span>Пазарна оценка</span><strong id="premium-market-price">—</strong></div><div><span>Обща инвестиция</span><strong id="premium-investment">—</strong></div><div><span>Брутна доходност</span><strong id="premium-gross-yield">—</strong></div><div><span>Нетна доходност</span><strong id="premium-net-yield">—</strong></div></div>
+        </div>
+      </section>
+    </section>
+
+    <section id="license-form" class="modal hidden" aria-modal="true" role="dialog">
+      <div class="modal-card"><button id="close-license" class="modal-close" type="button">×</button><h2>Активирай Premium</h2><p>Въведи лицензния ключ, получен след плащане.</p><input id="license-key" type="text" autocomplete="off" placeholder="XXXXXXXX-XXXX-XXXX-XXXX"><button id="verify-license" class="primary" type="button">Активирай</button><p id="license-status" role="status"></p></div>
+    </section>
+  </main>
+  <footer><span>Ориентировъчен анализ, не професионална оценка.</span><button id="privacy-link" type="button">Поверителност</button></footer>
+
+  <script src="../src/constants.js"></script><script src="../src/utils.js"></script><script src="../src/analyzer.js"></script><script src="../src/storage.js"></script><script src="popup.js"></script>
+</body>
+</html>

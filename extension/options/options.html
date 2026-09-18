@@ -1,0 +1,8 @@
+<!doctype html><html lang="bg"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>HomeLens настройки</title><link rel="stylesheet" href="options.css"></head>
+<body><main><header><div class="logo">⌂</div><div><h1>HomeLens</h1><p>Настройки на анализа</p></div></header>
+<section><h2>Ипотечен калкулатор</h2><div class="grid"><label>Годишна лихва (%)<input id="annualInterestRate" type="number" min="0" max="30" step="0.1"></label><label>Срок (години)<input id="mortgageYears" type="number" min="1" max="40"></label><label>Самоучастие (%)<input id="downPaymentPercent" type="number" min="0" max="100"></label><label>Разходи по придобиване (%)<input id="acquisitionCostsPercent" type="number" min="0" max="20" step="0.1"></label></div></section>
+<section><h2>Ремонт и инвестиция</h2><div class="grid"><label>Ремонт на м² (€)<input id="renovationPerSqm" type="number" min="0" max="5000"></label><label>Очакван месечен наем (€)<input id="monthlyRent" type="number" min="0" max="100000"></label><label>Незаетост (%)<input id="vacancyPercent" type="number" min="0" max="100"></label><label>Годишна поддръжка (%)<input id="annualMaintenancePercent" type="number" min="0" max="20" step="0.1"></label></div></section>
+<button id="save" class="primary" type="button">Запази настройките</button><p id="status" role="status"></p>
+<section class="data"><h2>Моите данни</h2><p>Наблюденията и запазените имоти се пазят локално в браузъра.</p><button id="clear-data" type="button">Изтрий локалните данни</button></section>
+</main><script src="../src/constants.js"></script><script src="../src/storage.js"></script><script src="options.js"></script></body></html>
+

@@ -1,0 +1,14 @@
+<!doctype html>
+<html lang="bg">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Моите имоти – HomeLens</title><link rel="stylesheet" href="saved.css"></head>
+<body>
+<header><div class="brand"><span>⌂</span><div><strong>HomeLens</strong><small>Моите запазени имоти</small></div></div><div><button id="export" class="secondary" type="button">Експорт CSV</button><button id="settings" class="icon" type="button">⚙</button></div></header>
+<main>
+  <section class="summary"><div><span>Запазени имоти</span><strong id="saved-count">0</strong></div><div><span>Средна цена на м²</span><strong id="average-sqm">—</strong></div><div><span>Средна цена</span><strong id="average-price">—</strong></div></section>
+  <section class="toolbar"><div><h1>Сравнение на имоти</h1><p>Всички данни са запазени локално в този браузър.</p></div><select id="sort"><option value="newest">Най-нови</option><option value="price-asc">Най-ниска цена</option><option value="sqm-asc">Най-ниска цена/м²</option><option value="area-desc">Най-голяма площ</option></select></section>
+  <section id="empty" class="empty hidden"><span>⌂</span><h2>Все още няма запазени имоти</h2><p>Отвори обява в поддържан портал и натисни „Запази имота“.</p></section>
+  <section id="properties" class="properties"></section>
+  <aside id="free-note" class="free-note hidden"><strong>Безплатен план</strong><span>Можеш да запазиш до 5 имота. Premium отключва неограничени имоти и пълен експорт.</span></aside>
+</main>
+<script src="../src/constants.js"></script><script src="../src/utils.js"></script><script src="../src/storage.js"></script><script src="saved.js"></script>
+</body></html>
